@@ -34,7 +34,7 @@ func GetPosts(c *gin.Context) {
 
 	var posts []models.Post
 
-	result := initializers.DB.Find(&posts)
+	result := initializers.DB.Model(&models.Post{}).Preload("Comments").Find(&posts)
 	if result.Error != nil {
 		c.JSON(400, gin.H{"error": "Failed to get posts"})
 		return
@@ -43,9 +43,9 @@ func GetPosts(c *gin.Context) {
 }
 
 func GetPost(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("postId")
 	var post models.Post
-	result := initializers.DB.First(&post, id)
+	result := initializers.DB.Model(&models.Post{}).Preload("Comments").First(&post, id)
 
 	if result.Error != nil {
 		c.JSON(400, gin.H{"error": "Failed to get post"})
@@ -55,7 +55,7 @@ func GetPost(c *gin.Context) {
 }
 
 func UpdatePost(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("postId")
 
 	var body struct {
 		Title string `json:"title"`
@@ -86,7 +86,7 @@ func UpdatePost(c *gin.Context) {
 }
 
 func DeletePost(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("postId")
 
 	result := initializers.DB.Delete(&models.Post{}, id)
 
