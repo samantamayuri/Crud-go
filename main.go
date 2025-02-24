@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/samantamayuri/Crud-go/controllers"
 	"github.com/samantamayuri/Crud-go/initializers"
+	"github.com/samantamayuri/Crud-go/middleware"
 )
 
 func init() {
@@ -26,5 +27,9 @@ func main() {
 	r.POST("/posts/:postId/comments", controllers.CreateComment)
 	r.PUT("/posts/:postId/comments/:commentId", controllers.UpdateComment)
 	r.DELETE("/posts/:postId/comments/:commentId", controllers.DeleteComment)
+
+	r.POST("/signup", controllers.SignUp)
+	r.POST("/login", controllers.Login)
+	r.GET("/validate", middleware.Authorize, controllers.ValidateUser)
 	r.Run()
 }

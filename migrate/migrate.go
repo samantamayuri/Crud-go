@@ -22,7 +22,7 @@ func main() {
 		log.Fatal("Database connection is nil! Cannot proceed with migration.")
 	}
 
-	err := initializers.DB.AutoMigrate(&models.Post{}, &models.Comment{})
+	err := initializers.DB.AutoMigrate(&models.Post{}, &models.Comment{}, &models.User{})
 	if err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
