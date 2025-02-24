@@ -8,6 +8,8 @@ import (
 
 func CreatePosts(c *gin.Context) {
 
+	user := c.MustGet("user").(models.User)
+
 	var body struct {
 		Title string `json:"title"`
 		Body  string `json:"body"`
@@ -18,7 +20,7 @@ func CreatePosts(c *gin.Context) {
 		return
 	}
 
-	post := models.Post{Title: body.Title, Body: body.Body}
+	post := models.Post{Title: body.Title, Body: body.Body, UserId: user.ID}
 
 	result := initializers.DB.Create(&post)
 	if result.Error != nil {
@@ -32,9 +34,11 @@ func CreatePosts(c *gin.Context) {
 
 func GetPosts(c *gin.Context) {
 
+	user := c.MustGet("user").(models.User)
+
 	var posts []models.Post
 
-	result := initializers.DB.Model(&models.Post{}).Preload("Comments").Find(&posts)
+	result := initializers.DB.Model(&models.Post{}).Preload("Comments").Where("user_id = ?", user.ID).Find(&posts)
 	if result.Error != nil {
 		c.JSON(400, gin.H{"error": "Failed to get posts"})
 		return
@@ -55,6 +59,9 @@ func GetPost(c *gin.Context) {
 }
 
 func UpdatePost(c *gin.Context) {
+
+	user := c.MustGet("user").(models.User)
+
 	id := c.Param("postId")
 
 	var body struct {
@@ -68,7 +75,7 @@ func UpdatePost(c *gin.Context) {
 	}
 
 	var post models.Post
-	result := initializers.DB.First(&post, id)
+	result := initializers.DB.Where("user_id = ?", user.ID).First(&post, id)
 	if result.Error != nil {
 		c.JSON(400, gin.H{"error": "Failed to update post"})
 		return
@@ -86,9 +93,19 @@ func UpdatePost(c *gin.Context) {
 }
 
 func DeletePost(c *gin.Context) {
+
+	user := c.MustGet("user").(models.User)
+
 	id := c.Param("postId")
 
-	result := initializers.DB.Delete(&models.Post{}, id)
+	var post models.Post
+	result := initializers.DB.Where("user_id = ?", user.ID).First(&post, id)
+	if result.Error != nil {
+		c.JSON(400, gin.H{"error": "Failed to delete post"})
+		return
+	}
+
+	result = initializers.DB.Delete(&post)
 
 	if result.Error != nil {
 		c.JSON(400, gin.H{"error": "Failed to delete post"})

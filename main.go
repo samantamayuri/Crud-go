@@ -18,11 +18,11 @@ func main() {
 	gin.SetMode(gin.DebugMode)
 
 	r := gin.Default()
-	r.POST("/posts", controllers.CreatePosts)
-	r.GET("/posts", controllers.GetPosts)
+	r.POST("/posts", middleware.Authorize, controllers.CreatePosts)
+	r.GET("/posts", middleware.Authorize, controllers.GetPosts)
 	r.GET("/posts/:postId", controllers.GetPost)
-	r.PUT("/posts/:postId", controllers.UpdatePost)
-	r.DELETE("/posts/:postId", controllers.DeletePost)
+	r.PUT("/posts/:postId", middleware.Authorize, controllers.UpdatePost)
+	r.DELETE("/posts/:postId", middleware.Authorize, controllers.DeletePost)
 
 	r.POST("/posts/:postId/comments", controllers.CreateComment)
 	r.PUT("/posts/:postId/comments/:commentId", controllers.UpdateComment)

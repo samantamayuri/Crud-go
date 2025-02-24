@@ -7,4 +7,5 @@ type Post struct {
 	Title    string
 	Body     string
 	Comments []Comment `gorm:"foreignKey:PostId;constraint:OnDelete:CASCADE;"`
+	UserId   uint      `gorm:"index"`
 }
